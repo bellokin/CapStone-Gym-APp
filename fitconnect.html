@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>FitConnect — Find Gyms & Coaches Near You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+/* ============================================================
+   FITCONNECT — DARK LUXURY ATHLETIC MOBILE APP
+   Palette: Obsidian + Electric Lime + Chrome
+   ============================================================ */
+  :root {
+  --bg:      #080808;
+  --surf:    #0F0F0F;
+  --card:    #141414;
+  --card2:   #1A1A1A;
+  --border:  #222222;
+  --border2: #2E2E2E;
+  --lime:    #C8FF00;
+  --lime2:   #A5D400;
+  --lime3:   #E8FF66;
+  --red:     #FF3B3B;
+  --orange:  #FF6B35;
+  --blue:    #00C8FF;
+  --gold:    #FFD700;
+  --green:   #00FF88;
+  --text:    #F2F2F2;
+  --text2:   #AAAAAA;
+  --text3:   #666666;
+  --phone-w: 393px;
+  --phone-h: 852px;
+  --r-xl:    24px;
+  --r-lg:    16px;
+  --r-md:    12px;
+  --r-sm:    8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: #030303; overflow: hidden; }
+
+/* ──── FONTS ──── */
+.font-display  { font-family: 'Black Han Sans', sans-serif; }
+.font-mono     { font-family: 'Space Mono', monospace; }
+.font-body     { font-family: 'DM Sans', sans-serif; }
+
+/* ──── OUTER SHELL ──── */
+#app-shell {
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 30% 20%, #1A2600 0%, #030303 55%),
+              radial-gradient(ellipse at 70% 80%, #001A0D 0%, transparent 50%);
+}
+
+/* ──── PHONE FRAME ──── */
+#phone {
+  width: var(--phone-w);
+  height: var(--phone-h);
+  background: var(--bg);
+  border-radius: 54px;
+  border: 1.5px solid #2A2A2A;
+  box-shadow:
+    0 0 0 7px #0C0C0C,
+    0 0 0 8px #1E1E1E,
+    0 50px 120px rgba(0,0,0,.9),
+    0 0 80px rgba(200,255,0,.06),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Dynamic Island */
+#dynamic-island {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  width: 126px; height: 37px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.di-camera { width: 12px; height: 12px; background: #1A1A1A; border-radius: 50%; border: 1.5px solid #2A2A2A; }
+.di-dot    { width: 6px; height: 6px; background: #333; border-radius: 50%; }
+
+/* Status bar */
+#status-bar {
+  height: 54px; padding: 14px 28px 0;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; position: relative; z-index: 10;
+}
+.status-time { font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:var(--text); }
+.status-icons { display:flex; gap:5px; align-items:center; }
+.status-icons span { font-size:12px; color:var(--text); }
+
+/* Screen container */
+#screen-container {
+  flex: 1; overflow: hidden; position: relative;
+}
+
+/* Individual screens */
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  transform: translateX(30px);
+  background: var(--bg);
+}
+.screen.active {
+  opacity: 1; pointer-events: all;
+  transform: translateX(0);
+}
+.screen.slide-back { transform: translateX(-30px); }
+
+/* Scrollable body area */
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+
+/* ──── BOTTOM NAV ──── */
+#bottom-nav {
+  height: 82px;
+  background: var(--surf);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start;
+  padding-top: 10px;
+  flex-shrink: 0;
+  position: relative; z-index: 50;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  cursor: pointer; padding: 4px 0;
+  background: none; border: none;
+  transition: all .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-icon { font-size: 22px; transition: transform .2s; line-height:1; }
+.nav-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text3); transition: color .2s;
+}
+.nav-dot { width:4px; height:4px; border-radius:50%; background:transparent; transition: background .2s; margin-top:1px; }
+.nav-item.active .nav-label { color: var(--lime); }
+.nav-item.active .nav-dot   { background: var(--lime); }
+.nav-item.active .nav-icon  { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(200,255,0,.5)); }
+.nav-item:active { opacity: .7; }
+
+/* ──── REUSABLE COMPONENTS ──── */
+
+/* Lime Button */
+.btn-lime {
+  background: linear-gradient(135deg, var(--lime) 0%, var(--lime2) 100%);
+  color: #000; border: none; border-radius: var(--r-md);
+  font-family: 'Space Mono', monospace;
+  font-weight: 700; font-size: 12px; letter-spacing: 1.5px;
+  text-transform: uppercase; cursor: pointer; padding: 14px 20px;
+  box-shadow: 0 4px 24px rgba(200,255,0,.3);
+  transition: all .15s; display: block; width: 100%; text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-lime:active { transform: scale(.97); box-shadow: 0 2px 12px rgba(200,255,0,.2); }
+.btn-lime.outlined {
+  background: transparent;
+  border: 2px solid var(--lime);
+  color: var(--lime);
+  box-shadow: none;
+}
+.btn-lime.sm { padding: 8px 16px; font-size: 10px; width: auto; border-radius: 8px; }
+
+/* Badge */
+.badge {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 8px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px;
+}
+.badge-lime   { background: rgba(200,255,0,.15); color: var(--lime);   border: 1px solid rgba(200,255,0,.25); }
+.badge-blue   { background: rgba(0,200,255,.12); color: var(--blue);   border: 1px solid rgba(0,200,255,.2); }
+.badge-orange { background: rgba(255,107,53,.12); color: var(--orange); border: 1px solid rgba(255,107,53,.2); }
+.badge-red    { background: rgba(255,59,59,.12);  color: var(--red);    border: 1px solid rgba(255,59,59,.2); }
+
+/* Card base */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 16px;
+  transition: border-color .2s;
+}
+.card:active { border-color: var(--border2); }
+
+/* Section header */
+.section-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 18px; color: var(--text); letter-spacing: .5px;
+}
+.see-all {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; color: var(--lime); cursor: pointer;
+  font-weight: 700; letter-spacing: 1px; background: none; border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.see-all:active { opacity:.6; }
+
+/* Input */
+.input-field {
+  width: 100%;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 13px 16px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+.input-field::placeholder { color: var(--text3); }
+.input-field:focus { border-color: rgba(200,255,0,.4); }
+
+/* Stars */
+.stars { color: var(--gold); font-size: 11px; letter-spacing: 1px; }
+
+/* Pill filter */
+.pill-row { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+.pill-row::-webkit-scrollbar { display:none; }
+.pill {
+  flex-shrink: 0;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  padding: 7px 16px; border-radius: 20px; cursor: pointer;
+  background: var(--card); color: var(--text3);
+  border: 1px solid var(--border); transition: all .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pill.active { background: var(--lime); color: #000; border-color: var(--lime); }
+.pill:active { opacity: .7; }
+
+/* Stats strip */
+.stats-strip { display:flex; gap:10px; margin-bottom:16px; }
+.stat-tile {
+  flex:1; background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:10px 6px; text-align:center;
+}
+.stat-icon { font-size:17px; line-height:1; margin-bottom:3px; }
+.stat-val  { font-family:'Space Mono',monospace; color:var(--lime); font-weight:700; font-size:15px; }
+.stat-lbl  { font-size:8px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; margin-top:1px; font-family:'Space Mono',monospace; }
+
+/* Available dot */
+.avail-dot {
+  display:inline-block; width:8px; height:8px;
+  border-radius:50%; margin-right:5px; vertical-align:middle;
+}
+
+/* Macro bar */
+.macro-row { display:flex; gap:6px; }
+.macro-tile {
+  flex:1; background:var(--card2); border-radius:8px;
+  padding:7px 4px; text-align:center;
+}
+.macro-val { font-family:'Space Mono',monospace; color:var(--lime); font-size:12px; font-weight:700; }
+.macro-lbl { font-size:8px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; }
+
+/* Progress bar */
+.progress-track { background:var(--border2); border-radius:4px; height:6px; margin-top:6px; overflow:hidden; }
+.progress-fill  { background: linear-gradient(90deg,var(--lime),var(--lime3)); height:100%; border-radius:4px; transition:width 1s ease; }
+
+/* Tag chip for day/time selectors */
+.chip {
+  padding:8px 14px; border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--card); color:var(--text2);
+  font-family:'Space Mono',monospace; font-size:11px; font-weight:700;
+  cursor:pointer; transition:all .15s; text-align:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.chip.selected { background:var(--lime); color:#000; border-color:var(--lime); }
+.chip.booked   { background:var(--card2); color:var(--border2); border-color:var(--border); cursor:default; }
+.chip:active:not(.booked) { transform:scale(.95); }
+
+/* Toast */
+#toast {
+  position:absolute; bottom:100px; left:50%; transform:translateX(-50%) translateY(30px);
+  background:var(--card2); border:1px solid var(--lime);
+  border-radius:12px; padding:10px 18px;
+  font-family:'Space Mono',monospace; font-size:11px; color:var(--lime); font-weight:700;
+  white-space:nowrap; z-index:999; pointer-events:none;
+  opacity:0; transition:all .3s;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ──── ONBOARDING ──── */
+#screen-onboarding {
+  background: radial-gradient(ellipse at 50% 0%, #1A2800 0%, var(--bg) 65%);
+}
+.ob-slides { flex:1; position:relative; overflow:hidden; }
+.ob-slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:30px 28px; text-align:center;
+  opacity:0; transition:opacity .4s, transform .4s;
+  transform:translateX(40px);
+}
+.ob-slide.active { opacity:1; transform:translateX(0); }
+.ob-slide.out    { opacity:0; transform:translateX(-40px); }
+.ob-emoji { font-size:88px; margin-bottom:20px; filter:drop-shadow(0 10px 30px rgba(200,255,0,.2)); animation:float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.ob-title { font-family:'Black Han Sans',sans-serif; font-size:42px; line-height:1; color:var(--text); margin-bottom:14px; }
+.ob-title span { color:var(--lime); }
+.ob-sub { font-size:15px; color:var(--text2); line-height:1.65; max-width:280px; }
+.ob-dots { display:flex; gap:8px; justify-content:center; margin:20px 0; }
+.ob-dot { height:8px; border-radius:4px; background:var(--border2); transition:all .3s; }
+.ob-dot.active { width:28px; background:var(--lime); }
+.ob-dot:not(.active) { width:8px; }
+.ob-actions { padding:0 28px 32px; display:flex; flex-direction:column; gap:10px; }
+.btn-ghost {
+  background:none; border:none; color:var(--text3);
+  font-family:'Space Mono',monospace; font-size:12px;
+  cursor:pointer; padding:8px; text-align:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-ghost:active { opacity:.6; }
+
+/* ──── AUTH ──── */
+#screen-auth {
+  background: radial-gradient(ellipse at 50% -10%, #111900 0%, var(--bg) 60%);
+  padding: 24px;
+}
+.auth-logo { text-align:center; margin-bottom:24px; }
+.auth-logo-mark {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:56px; height:56px; background:var(--lime);
+  border-radius:16px; font-size:26px; margin-bottom:10px;
+  box-shadow:0 4px 24px rgba(200,255,0,.3);
+}
+.auth-mode-toggle {
+  display:flex; background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:4px; margin-bottom:20px;
+}
+.auth-tab {
+  flex:1; padding:9px 4px; border-radius:8px; border:none;
+  font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase; cursor:pointer;
+  background:transparent; color:var(--text3); transition:all .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.auth-tab.active { background:var(--lime); color:#000; }
+.auth-fields { display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+.divider-or {
+  display:flex; align-items:center; gap:12px; margin:4px 0;
+}
+.divider-or::before,.divider-or::after { content:''; flex:1; height:1px; background:var(--border); }
+.divider-or span { font-family:'Space Mono',monospace; font-size:10px; color:var(--text3); }
+.btn-social {
+  width:100%; padding:13px; background:var(--card);
+  border:1.5px solid var(--border); border-radius:12px;
+  color:var(--text); font-family:'DM Sans',sans-serif;
+  font-size:14px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.btn-social:active { border-color:var(--border2); opacity:.8; }
+.auth-switch { text-align:center; margin-top:16px; font-size:13px; color:var(--text2); }
+.auth-switch a { color:var(--lime); font-weight:700; cursor:pointer; }
+
+/* goal selection */
+.goal-option {
+  padding:14px 16px; background:var(--card); border:2px solid var(--border);
+  border-radius:12px; color:var(--text); font-family:'DM Sans',sans-serif;
+  font-weight:600; font-size:14px; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center;
+  transition:all .2s; -webkit-tap-highlight-color:transparent;
+}
+.goal-option.selected { border-color:var(--lime); background:rgba(200,255,0,.08); color:var(--lime); }
+.goal-option:active { transform:scale(.98); }
+
+/* ──── HOME ──── */
+#screen-home .top-gradient {
+  background: linear-gradient(180deg, #0D1800 0%, transparent 100%);
+  padding:16px 20px 0;
+}
+.home-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+.home-greeting-sub { font-family:'Space Mono',monospace; font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-bottom:3px; }
+.home-greeting-name { font-family:'Black Han Sans',sans-serif; font-size:30px; color:var(--text); line-height:1; }
+.home-header-actions { display:flex; gap:10px; }
+.icon-btn {
+  width:38px; height:38px; border-radius:11px;
+  background:var(--card); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px; cursor:pointer;
+  transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.icon-btn:active { border-color:var(--lime); }
+.avatar-btn {
+  width:38px; height:38px; border-radius:11px;
+  background: linear-gradient(135deg,var(--lime),var(--lime2));
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+  cursor:pointer; box-shadow:0 2px 12px rgba(200,255,0,.25);
+}
+.search-bar {
+  background:var(--card); border:1.5px solid var(--border);
+  border-radius:14px; padding:11px 14px;
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:14px; cursor:pointer;
+  transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.search-bar:active { border-color:rgba(200,255,0,.3); }
+.search-placeholder { font-family:'DM Sans',monospace; font-size:13px; color:var(--text3); flex:1; }
+.search-filter-btn {
+  background:rgba(200,255,0,.1); border:1px solid rgba(200,255,0,.2);
+  border-radius:8px; padding:4px 10px;
+  font-family:'Space Mono',monospace; font-size:9px; color:var(--lime); font-weight:700; letter-spacing:1px;
+}
+
+/* Featured gym card */
+.featured-card {
+  background: linear-gradient(135deg, var(--card) 0%, #0C1500 100%);
+  border:1.5px solid rgba(200,255,0,.2);
+  border-radius:22px; padding:18px;
+  margin-bottom:10px; cursor:pointer; position:relative; overflow:hidden;
+  transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.featured-card::before {
+  content:''; position:absolute;
+  top:-30px; right:-20px; font-size:100px;
+  opacity:.08; pointer-events:none;
+  font-family:sans-serif;
+}
+.featured-card:active { border-color:rgba(200,255,0,.5); }
+.featured-gym-name { font-family:'Black Han Sans',sans-serif; font-size:24px; color:var(--text); margin:6px 0 4px; }
+.featured-meta { font-family:'Space Mono',monospace; font-size:10px; color:var(--text3); margin-bottom:10px; }
+.featured-bottom {
+  background:rgba(0,0,0,.5); border-radius:10px; padding:8px 12px;
+  display:flex; justify-content:space-between; align-items:center; margin-top:14px;
+}
+
+/* Coach card (horizontal scroll) */
+.coach-scroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+.coach-scroll::-webkit-scrollbar { display:none; }
+.coach-card-mini {
+  flex-shrink:0; width:138px; background:var(--card);
+  border:1px solid var(--border); border-radius:18px; padding:14px;
+  cursor:pointer; transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.coach-card-mini:active { border-color:rgba(200,255,0,.3); }
+.coach-avatar-mini {
+  font-size:36px; text-align:center;
+  background:var(--card2); border-radius:12px; padding:8px 0; margin-bottom:8px;
+}
+.coach-mini-name { font-weight:700; font-size:13px; color:var(--text); margin-bottom:2px; }
+.coach-mini-spec { font-size:10px; color:var(--text3); margin-bottom:6px; line-height:1.3; }
+.coach-mini-footer { display:flex; justify-content:space-between; align-items:center; }
+
+/* Quick grid */
+.quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.quick-tile {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:14px; cursor:pointer; display:flex; align-items:center; gap:12px;
+  transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.quick-tile:active { border-color:rgba(200,255,0,.3); }
+.quick-icon { font-size:26px; }
+.quick-label { font-weight:700; font-size:13px; color:var(--text); }
+.quick-sub   { font-size:10px; color:var(--text3); font-family:'Space Mono',monospace; margin-top:1px; }
+
+/* ──── GYMS LIST ──── */
+.gym-list-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:18px; padding:15px; margin-bottom:12px;
+  cursor:pointer; display:flex; gap:13px;
+  transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.gym-list-card:active { border-color:rgba(200,255,0,.3); }
+.gym-thumb {
+  width:62px; height:62px; border-radius:14px;
+  background:var(--card2); display:flex; align-items:center; justify-content:center;
+  font-size:28px; flex-shrink:0;
+}
+.gym-name { font-family:'Black Han Sans',sans-serif; font-size:18px; color:var(--text); }
+.gym-loc  { font-family:'Space Mono',monospace; font-size:10px; color:var(--text3); margin-bottom:6px; }
+.gym-price{ font-family:'Space Mono',monospace; color:var(--lime); font-weight:700; font-size:16px; }
+.gym-price span { font-size:9px; color:var(--text3); }
+
+/* ──── GYM DETAIL ──── */
+.detail-hero {
+  background: linear-gradient(180deg, #0D1800 0%, var(--bg) 100%);
+  padding:12px 20px 20px;
+}
+.back-btn {
+  display:flex; align-items:center; gap:8px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:10px; padding:7px 12px; cursor:pointer; margin-bottom:16px;
+  font-family:'Space Mono',monospace; font-size:11px; color:var(--text2); font-weight:700;
+  width:fit-content; -webkit-tap-highlight-color:transparent;
+}
+.back-btn:active { opacity:.7; }
+.detail-emoji { font-size:72px; text-align:center; margin-bottom:10px; display:block; }
+.detail-gym-name { font-family:'Black Han Sans',sans-serif; font-size:34px; color:var(--text); text-align:center; }
+.detail-gym-loc  { text-align:center; font-family:'Space Mono',monospace; font-size:11px; color:var(--text3); margin:6px 0 12px; }
+
+.tab-bar {
+  display:flex; background:var(--surf);
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:20;
+}
+.tab-btn {
+  flex:1; background:none; border:none; border-bottom:2.5px solid transparent;
+  padding:12px 4px; font-family:'Space Mono',monospace;
+  font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text3); cursor:pointer; transition:all .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.tab-btn.active { color:var(--lime); border-bottom-color:var(--lime); }
+
+.tab-panel { display:none; padding:16px; }
+.tab-panel.active { display:block; }
+
+/* amenity tag */
+.amenity {
+  display:inline-block; background:var(--card2);
+  border:1px solid var(--border); border-radius:8px;
+  padding:6px 10px; font-size:12px; color:var(--text); margin:3px;
+}
+
+/* schedule row */
+.schedule-row {
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+  padding:13px 15px; margin-bottom:10px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.sched-time  { font-family:'Space Mono',monospace; color:var(--lime); font-size:12px; font-weight:700; }
+.sched-name  { font-weight:700; font-size:15px; color:var(--text); }
+.sched-meta  { font-size:11px; color:var(--text2); }
+
+/* review card */
+.review-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px; }
+.review-author { font-weight:700; color:var(--text); font-size:14px; }
+.review-text   { color:var(--text2); font-size:13px; line-height:1.55; margin-top:6px; }
+
+/* plan card */
+.plan-card {
+  border-radius:20px; padding:20px; margin-bottom:14px;
+  border:2px solid var(--border);
+  background:var(--card); position:relative; overflow:hidden;
+}
+.plan-card.highlighted {
+  background: linear-gradient(135deg, #0E1C00, #1D3500);
+  border-color: var(--lime);
+}
+.plan-badge {
+  position:absolute; top:0; right:16px;
+  background:var(--lime); color:#000;
+  font-family:'Space Mono',monospace; font-size:8px; font-weight:700; letter-spacing:2px;
+  padding:4px 12px; border-radius:0 0 10px 10px;
+}
+.plan-name  { font-family:'Black Han Sans',sans-serif; font-size:28px; margin-top:8px; }
+.plan-price { font-family:'Space Mono',monospace; font-weight:700; font-size:30px; color:var(--lime); margin:6px 0 14px; }
+.plan-price span { font-size:12px; color:var(--text3); }
+.plan-feature { display:flex; align-items:center; gap:10px; padding:4px 0; font-size:13px; color:var(--text2); }
+.plan-check { width:20px; height:20px; border-radius:6px; background:rgba(200,255,0,.12); border:1px solid rgba(200,255,0,.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--lime); font-size:10px; font-weight:700; }
+
+/* ──── INSTRUCTORS ──── */
+.instructor-card {
+  background:var(--card); border:1px solid var(--border); border-radius:18px;
+  padding:16px; margin-bottom:12px; cursor:pointer;
+  transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.instructor-card:active { border-color:rgba(200,255,0,.3); }
+.inst-avatar {
+  width:62px; height:62px; border-radius:14px;
+  background:var(--card2); display:flex; align-items:center; justify-content:center;
+  font-size:32px; flex-shrink:0; position:relative;
+}
+.inst-avail-dot {
+  position:absolute; bottom:3px; right:3px;
+  width:11px; height:11px; border-radius:50%; border:2px solid var(--card);
+}
+.inst-name  { font-weight:700; font-size:16px; color:var(--text); margin-bottom:1px; }
+.inst-spec  { font-size:11px; color:var(--text3); font-family:'Space Mono',monospace; margin-bottom:6px; }
+.inst-footer {
+  background:var(--card2); border-radius:10px; padding:8px 12px;
+  display:flex; justify-content:space-between; align-items:center; margin-top:10px;
+}
+
+/* ──── INSTRUCTOR DETAIL / BOOKING ──── */
+.booking-summary {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:16px; margin-bottom:20px;
+}
+.booking-row { display:flex; justify-content:space-between; padding:5px 0; font-size:13px; color:var(--text2); }
+.booking-total { display:flex; justify-content:space-between; padding-top:10px; margin-top:4px; border-top:1px solid var(--border); }
+.booking-total span:first-child { font-weight:700; color:var(--text); font-size:15px; }
+.booking-total span:last-child  { font-family:'Space Mono',monospace; font-weight:700; font-size:20px; color:var(--lime); }
+
+/* Confirmation screen */
+.confirm-screen {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:28px;
+  text-align:center;
+}
+.confirm-emoji { font-size:80px; margin-bottom:16px; animation:pop .5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
+.confirm-title { font-family:'Black Han Sans',sans-serif; font-size:34px; color:var(--lime); margin-bottom:8px; }
+
+/* ──── WELLNESS ──── */
+.focus-card {
+  background: linear-gradient(135deg, rgba(200,255,0,.15), rgba(0,26,0,.8));
+  border:1.5px solid rgba(200,255,0,.25); border-radius:18px; padding:16px; margin-bottom:14px;
+}
+.tip-card {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.tip-card.expanded { border-color:rgba(200,255,0,.2); }
+.tip-card:active { border-color:rgba(200,255,0,.2); }
+.tip-icon { font-size:28px; margin-right:12px; flex-shrink:0; }
+.tip-title { font-weight:700; font-size:15px; color:var(--text); }
+.tip-body  { color:var(--text2); font-size:13px; line-height:1.6; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:none; }
+.tip-card.expanded .tip-body { display:block; }
+
+.diet-card {
+  background:var(--card); border:1px solid var(--border); border-radius:18px;
+  padding:16px; margin-bottom:14px;
+}
+.diet-name  { font-family:'Black Han Sans',sans-serif; font-size:24px; color:var(--text); margin:8px 0 4px; }
+.diet-desc  { color:var(--text2); font-size:12px; line-height:1.5; margin-bottom:12px; }
+
+.program-card {
+  background:var(--card); border:2px solid var(--border); border-radius:20px;
+  padding:18px; margin-bottom:14px; position:relative; overflow:hidden;
+}
+.program-bg-icon { position:absolute; bottom:-10px; right:-10px; font-size:80px; opacity:.06; pointer-events:none; }
+.program-name  { font-family:'Black Han Sans',sans-serif; font-size:24px; color:var(--text); margin:8px 0 10px; }
+.program-meta  { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:12px; }
+.program-meta-item { font-family:'Space Mono',monospace; font-size:11px; color:var(--text2); }
+.enrolled-banner {
+  background:rgba(200,255,0,.12); border:1.5px solid var(--lime);
+  border-radius:12px; padding:12px 14px; margin-bottom:14px;
+}
+
+/* ──── PROFILE ──── */
+.profile-hero {
+  background: linear-gradient(180deg, #0D1800, var(--bg));
+  padding:20px 20px 24px; text-align:center;
+}
+.profile-avatar {
+  width:80px; height:80px; border-radius:24px;
+  background: linear-gradient(135deg,var(--lime),var(--lime2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; margin:0 auto 12px;
+  border:3px solid rgba(200,255,0,.3);
+  box-shadow:0 4px 24px rgba(200,255,0,.2);
+}
+.profile-name  { font-family:'Black Han Sans',sans-serif; font-size:26px; color:var(--text); }
+.profile-email { font-family:'Space Mono',monospace; font-size:11px; color:var(--text3); margin:4px 0 12px; }
+
+.profile-menu-item {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:15px 16px; margin-bottom:10px;
+  display:flex; justify-content:space-between; align-items:center; cursor:pointer;
+  transition:border-color .2s; -webkit-tap-highlight-color:transparent;
+}
+.profile-menu-item:active { border-color:var(--border2); }
+.profile-menu-left { display:flex; gap:13px; align-items:center; }
+.profile-menu-icon { font-size:22px; }
+.profile-menu-label { font-weight:700; font-size:15px; color:var(--text); }
+.profile-menu-arrow { color:var(--text3); font-size:18px; }
+
+.btn-signout {
+  width:100%; padding:15px; background:rgba(255,59,59,.1);
+  border:1.5px solid rgba(255,59,59,.25); border-radius:14px;
+  color:var(--red); font-family:'Space Mono',monospace;
+  font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  cursor:pointer; margin-top:8px;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-signout:active { opacity:.7; }
+
+/* ──── ANIMATIONS ──── */
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.anim-in { animation:slideIn .35s ease both; }
+
+/* Stagger children */
+.stagger > * { animation:slideIn .35s ease both; }
+.stagger > *:nth-child(1) { animation-delay:.05s }
+.stagger > *:nth-child(2) { animation-delay:.10s }
+.stagger > *:nth-child(3) { animation-delay:.15s }
+.stagger > *:nth-child(4) { animation-delay:.20s }
+.stagger > *:nth-child(5) { animation-delay:.25s }
+.stagger > *:nth-child(6) { animation-delay:.30s }
+
+/* Lime glow pulse on featured */
+@keyframes glowPulse { 0%,100%{box-shadow:0 0 20px rgba(200,255,0,.1)} 50%{box-shadow:0 0 40px rgba(200,255,0,.25)} }
+.featured-card { animation:glowPulse 3s ease-in-out infinite; }
+
+/* Open status blink */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+.open-dot { animation:blink 2s ease-in-out infinite; }
+
+/* ──── MISC UTILITIES ──── */
+.px-20 { padding-left:20px; padding-right:20px; }
+.pb-100 { padding-bottom:100px; }
+.mt-4  { margin-top:4px; }
+.mt-6  { margin-top:6px; }
+.mt-8  { margin-top:8px; }
+.mt-12 { margin-top:12px; }
+.mt-16 { margin-top:16px; }
+.mt-20 { margin-top:20px; }
+.mb-4  { margin-bottom:4px; }
+.mb-8  { margin-bottom:8px; }
+.mb-12 { margin-bottom:12px; }
+.mb-16 { margin-bottom:16px; }
+.flex  { display:flex; }
+.flex-col { flex-direction:column; }
+.items-center { align-items:center; }
+.justify-between { justify-content:space-between; }
+.gap-6  { gap:6px; }
+.gap-8  { gap:8px; }
+.gap-10 { gap:10px; }
+.gap-14 { gap:14px; }
+.flex-1 { flex:1; }
+.text-lime   { color:var(--lime); }
+.text-muted  { color:var(--text3); }
+.text-muted2 { color:var(--text2); }
+.text-text   { color:var(--text); }
+.fw-700 { font-weight:700; }
+.fw-800 { font-weight:800; }
+.fs-10  { font-size:10px; }
+.fs-11  { font-size:11px; }
+.fs-12  { font-size:12px; }
+.fs-13  { font-size:13px; }
+.fs-14  { font-size:14px; }
+.lh-1   { line-height:1; }
+.ls-2   { letter-spacing:2px; }
+.uppercase { text-transform:uppercase; }
+.text-center { text-align:center; }
+.w-full { width:100%; }
+.divider { height:1px; background:var(--border); margin:10px 0; }
+.info-row {
+  display:flex; justify-content:space-between; padding:7px 0;
+  border-bottom:1px solid var(--border); font-size:13px;
+}
+.info-row:last-child { border-bottom:none; }
+.info-label { color:var(--text2); }
+.info-val   { color:var(--text); font-family:'Space Mono',monospace; }
+</style>
+</head>
+<body>
+
+<div id="app-shell">
+  <div id="phone">
+
+    <!-- Dynamic Island -->
+    <div id="dynamic-island">
+      <div class="di-camera"></div>
+      <div class="di-dot"></div>
+    </div>
+
+    <!-- Status Bar -->
+    <div id="status-bar">
+      <span class="status-time" id="time-display">9:41</span>
+      <div class="status-icons">
+        <span>●●●●</span>
+        <span>WiFi</span>
+        <span>🔋</span>
+      </div>
+    </div>
+
+    <!-- Screen Container -->
+    <div id="screen-container">
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: ONBOARDING
+           ═══════════════════════════════════════ -->
+      <div class="screen active" id="screen-onboarding">
+        <div class="ob-slides">
+          <div class="ob-slide active" data-slide="0">
+            <div class="ob-emoji">🏋️‍♀️</div>
+            <div class="ob-title">FIND YOUR<br><span>GYM</span></div>
+            <p class="ob-sub">Discover premium fitness facilities near you — filtered by price, schedule & amenities.</p>
+          </div>
+          <div class="ob-slide" data-slide="1">
+            <div class="ob-emoji">🧑‍🏫</div>
+            <div class="ob-title">BOOK<br><span>COACHES</span></div>
+            <p class="ob-sub">Connect with certified personal trainers. Book sessions that fit your schedule & budget.</p>
+          </div>
+          <div class="ob-slide" data-slide="2">
+            <div class="ob-emoji">🥗</div>
+            <div class="ob-title">EAT.<br>MOVE. <span>WIN.</span></div>
+            <p class="ob-sub">Custom diet plans, weight loss programs, and daily health tips tailored to your goals.</p>
+          </div>
+        </div>
+        <div class="ob-dots" id="ob-dots">
+          <div class="ob-dot active"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+        </div>
+        <div class="ob-actions">
+          <button class="btn-lime" id="ob-next-btn" onclick="obNext()">Next →</button>
+          <button class="btn-ghost" id="ob-skip-btn" onclick="showScreen('auth')">Skip</button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: AUTH
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-auth" style="overflow-y:auto;padding:20px 24px 40px;">
+        <div class="auth-logo">
+          <div class="auth-logo-mark">⚡</div>
+          <div style="font-family:'Black Han Sans',sans-serif;font-size:28px;color:var(--text);">FITCONNECT</div>
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:2px;">YOUR FITNESS. YOUR WAY.</div>
+        </div>
+
+        <div class="auth-mode-toggle">
+          <button class="auth-tab active" id="auth-signin-tab" onclick="switchAuthMode('signin')">Sign In</button>
+          <button class="auth-tab" id="auth-signup-tab" onclick="switchAuthMode('signup')">Sign Up</button>
+        </div>
+
+        <div id="auth-signin-form">
+          <div class="auth-fields">
+            <input class="input-field" type="email" placeholder="Email address"/>
+            <input class="input-field" type="password" placeholder="Password"/>
+          </div>
+          <button class="btn-lime" onclick="loginUser()">Sign In →</button>
+          <div class="divider-or mt-16"><span>OR</span></div>
+          <button class="btn-social mt-6" onclick="loginUser()">🌐 Continue with Google</button>
+        </div>
+
+        <div id="auth-signup-form" style="display:none;">
+          <div id="signup-step1">
+            <div class="auth-fields">
+              <input class="input-field" type="text" placeholder="Full Name"/>
+              <input class="input-field" type="email" placeholder="Email address"/>
+              <input class="input-field" type="password" placeholder="Create Password"/>
+            </div>
+            <button class="btn-lime" onclick="showSignupStep2()">Continue →</button>
+            <div class="divider-or mt-16"><span>OR</span></div>
+            <button class="btn-social mt-6" onclick="loginUser()">🌐 Sign up with Google</button>
+          </div>
+          <div id="signup-step2" style="display:none;">
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:2px;margin-bottom:6px;">STEP 2 OF 2</div>
+            <div style="font-family:'Black Han Sans',sans-serif;font-size:28px;color:var(--text);margin-bottom:4px;">WHAT'S YOUR <span style="color:var(--lime);">GOAL?</span></div>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:18px;">We'll personalize everything for you.</p>
+            <div style="display:flex;flex-direction:column;gap:10px;" id="goal-options">
+              <div class="goal-option" onclick="selectGoal(this)">🔥 Lose Weight</div>
+              <div class="goal-option" onclick="selectGoal(this)">💪 Build Muscle</div>
+              <div class="goal-option" onclick="selectGoal(this)">🏃 Improve Endurance</div>
+              <div class="goal-option" onclick="selectGoal(this)">🧘 Stay Fit & Flexible</div>
+              <div class="goal-option" onclick="selectGoal(this)">⚡ Boost Energy</div>
+            </div>
+            <button class="btn-lime mt-20" onclick="loginUser()" style="margin-top:20px;">Create My Account →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: HOME
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-home">
+        <div class="scroll-area">
+          <div style="background:linear-gradient(180deg,#0D1800 0%,transparent 100%);padding:14px 20px 0;">
+            <div class="home-header">
+              <div>
+                <div class="home-greeting-sub">Good Morning</div>
+                <div class="home-greeting-name">CHIDI 👋</div>
+              </div>
+              <div class="home-header-actions">
+                <div class="icon-btn" onclick="showToast('🔔 No new notifications')">🔔</div>
+                <div class="avatar-btn" onclick="showTab('profile')">👤</div>
+              </div>
+            </div>
+
+            <div class="stats-strip stagger">
+              <div class="stat-tile">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-val">1,240</div>
+                <div class="stat-lbl">Cal Burned</div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon">⏱</div>
+                <div class="stat-val">4.5h</div>
+                <div class="stat-lbl">This Week</div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-val">87%</div>
+                <div class="stat-lbl">Goal</div>
+              </div>
+            </div>
+
+            <div class="search-bar" onclick="showTab('gyms')">
+              <span style="font-size:18px;color:var(--text3);">🔍</span>
+              <span class="search-placeholder">Search gyms, coaches, classes…</span>
+              <div class="search-filter-btn">⚙ FILTER</div>
+            </div>
+
+            <div class="pill-row mb-12" id="home-pills">
+              <div class="pill active" onclick="setPill(this,'home-pills')">All</div>
+              <div class="pill" onclick="setPill(this,'home-pills')">Nearby</div>
+              <div class="pill" onclick="setPill(this,'home-pills')">Top Rated</div>
+              <div class="pill" onclick="setPill(this,'home-pills')">Budget</div>
+              <div class="pill" onclick="setPill(this,'home-pills')">Premium</div>
+            </div>
+          </div>
+
+          <div class="px-20 pb-100">
+            <!-- Featured Gyms -->
+            <div class="section-header mt-4">
+              <span class="section-title">FEATURED</span>
+              <button class="see-all" onclick="showTab('gyms')">SEE ALL →</button>
+            </div>
+
+            <div class="featured-card" onclick="showGymDetail(0)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div>
+                  <span class="badge badge-lime">PREMIUM</span>
+                  <div class="featured-gym-name">APEX FITNESS</div>
+                  <div class="featured-meta">📍 Lagos Island · 0.3 km</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <span class="badge badge-blue">CrossFit</span>
+                    <span class="badge badge-blue">Pool</span>
+                    <span class="badge badge-blue">Sauna</span>
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:20px;">₦89k<span style="font-size:10px;color:var(--text3);">/mo</span></div>
+                  <div class="stars mt-4">★★★★★</div>
+                  <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);">4.9 (1,240)</div>
+                </div>
+              </div>
+              <div class="featured-bottom">
+                <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);">⏰ 5:00 AM – 11:00 PM</span>
+                <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--green);font-weight:700;"><span class="open-dot">●</span> OPEN NOW</span>
+              </div>
+            </div>
+
+            <div class="featured-card" style="animation-delay:.15s;" onclick="showGymDetail(2)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div>
+                  <span class="badge badge-lime">PREMIUM</span>
+                  <div class="featured-gym-name">PULSE STUDIO</div>
+                  <div class="featured-meta">📍 Victoria Island · 1.2 km</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <span class="badge badge-blue">Yoga</span>
+                    <span class="badge badge-blue">Pilates</span>
+                    <span class="badge badge-blue">HIIT</span>
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:20px;">₦110k<span style="font-size:10px;color:var(--text3);">/mo</span></div>
+                  <div class="stars mt-4">★★★★★</div>
+                  <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);">4.8 (560)</div>
+                </div>
+              </div>
+              <div class="featured-bottom">
+                <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);">⏰ 6:00 AM – 9:00 PM</span>
+                <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--green);font-weight:700;"><span class="open-dot">●</span> OPEN NOW</span>
+              </div>
+            </div>
+
+            <!-- Top Coaches -->
+            <div class="section-header mt-20">
+              <span class="section-title">TOP COACHES</span>
+              <button class="see-all" onclick="showTab('instructors')">SEE ALL →</button>
+            </div>
+            <div class="coach-scroll">
+              <div class="coach-card-mini" onclick="showInstructorDetail(0)">
+                <div class="coach-avatar-mini">👨🏾‍🦱</div>
+                <div class="coach-mini-name">Chidi O.</div>
+                <div class="coach-mini-spec">Strength & Conditioning</div>
+                <div class="coach-mini-footer">
+                  <span class="stars" style="font-size:10px;">★ 4.95</span>
+                  <span style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:12px;">₦17.5k</span>
+                </div>
+                <div style="margin-top:6px;"><span class="avail-dot" style="background:var(--green);"></span><span style="font-size:9px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">AVAILABLE</span></div>
+              </div>
+              <div class="coach-card-mini" onclick="showInstructorDetail(1)">
+                <div class="coach-avatar-mini">👩🏾</div>
+                <div class="coach-mini-name">Amara N.</div>
+                <div class="coach-mini-spec">HIIT & Weight Loss</div>
+                <div class="coach-mini-footer">
+                  <span class="stars" style="font-size:10px;">★ 4.88</span>
+                  <span style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:12px;">₦15k</span>
+                </div>
+                <div style="margin-top:6px;"><span class="avail-dot" style="background:var(--green);"></span><span style="font-size:9px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">AVAILABLE</span></div>
+              </div>
+              <div class="coach-card-mini" onclick="showInstructorDetail(2)">
+                <div class="coach-avatar-mini">🧘🏾‍♂️</div>
+                <div class="coach-mini-name">Emeka A.</div>
+                <div class="coach-mini-spec">Yoga & Mobility</div>
+                <div class="coach-mini-footer">
+                  <span class="stars" style="font-size:10px;">★ 4.92</span>
+                  <span style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:12px;">₦14k</span>
+                </div>
+                <div style="margin-top:6px;"><span class="avail-dot" style="background:var(--text3);"></span><span style="font-size:9px;color:var(--text3);font-family:'Space Mono',monospace;font-weight:700;">BUSY</span></div>
+              </div>
+              <div class="coach-card-mini" onclick="showInstructorDetail(3)">
+                <div class="coach-avatar-mini">🥊</div>
+                <div class="coach-mini-name">Fatima B.</div>
+                <div class="coach-mini-spec">Boxing & Kickboxing</div>
+                <div class="coach-mini-footer">
+                  <span class="stars" style="font-size:10px;">★ 4.85</span>
+                  <span style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:12px;">₦20k</span>
+                </div>
+                <div style="margin-top:6px;"><span class="avail-dot" style="background:var(--green);"></span><span style="font-size:9px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">AVAILABLE</span></div>
+              </div>
+            </div>
+
+            <!-- Quick Access -->
+            <div class="section-header mt-20">
+              <span class="section-title">QUICK ACCESS</span>
+            </div>
+            <div class="quick-grid">
+              <div class="quick-tile" onclick="showTab('wellness');setWellnessTab('diet')">
+                <span class="quick-icon">🥗</span>
+                <div><div class="quick-label">Diet Plans</div><div class="quick-sub">Custom nutrition</div></div>
+              </div>
+              <div class="quick-tile" onclick="showTab('wellness');setWellnessTab('programs')">
+                <span class="quick-icon">🔥</span>
+                <div><div class="quick-label">Programs</div><div class="quick-sub">Weight loss</div></div>
+              </div>
+              <div class="quick-tile" onclick="showTab('wellness');setWellnessTab('tips')">
+                <span class="quick-icon">💡</span>
+                <div><div class="quick-label">Health Tips</div><div class="quick-sub">Daily insights</div></div>
+              </div>
+              <div class="quick-tile" onclick="showGymDetail(0)">
+                <span class="quick-icon">📋</span>
+                <div><div class="quick-label">My Plan</div><div class="quick-sub">ELITE member</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: GYMS LIST
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-gyms">
+        <div class="scroll-area">
+          <div class="px-20 pb-100 mt-12">
+            <div style="font-family:'Black Han Sans',sans-serif;font-size:34px;color:var(--text);line-height:1;margin-bottom:4px;">FIND <span style="color:var(--lime);">GYM</span></div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:16px;">📍 Lagos, Nigeria · 4 gyms found</div>
+
+            <div class="pill-row mb-16" id="gym-pills">
+              <div class="pill active" onclick="setPill(this,'gym-pills')">Rating</div>
+              <div class="pill" onclick="setPill(this,'gym-pills')">Price ↑</div>
+              <div class="pill" onclick="setPill(this,'gym-pills')">Distance</div>
+              <div class="pill" onclick="setPill(this,'gym-pills')">Budget</div>
+            </div>
+
+            <div class="stagger" id="gym-list">
+              <div class="gym-list-card" onclick="showGymDetail(0)">
+                <div class="gym-thumb">🏋️</div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-center">
+                    <div class="gym-name">APEX FITNESS</div>
+                    <div class="gym-price">₦89k<span>/mo</span></div>
+                  </div>
+                  <div class="gym-loc">📍 Lagos Island · 0.3 km</div>
+                  <div class="flex gap-6 mb-4">
+                    <span class="badge badge-blue">CrossFit</span>
+                    <span class="badge badge-blue">Pool</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <div><span class="stars">★★★★★</span> <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">4.9</span></div>
+                    <span style="font-size:10px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;"><span class="open-dot">●</span> OPEN</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="gym-list-card" onclick="showGymDetail(1)">
+                <div class="gym-thumb">💪</div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-center">
+                    <div class="gym-name">IRON TEMPLE</div>
+                    <div class="gym-price">₦65k<span>/mo</span></div>
+                  </div>
+                  <div class="gym-loc">📍 Lekki · 0.8 km</div>
+                  <div class="flex gap-6 mb-4">
+                    <span class="badge badge-orange">Powerlifting</span>
+                    <span class="badge badge-orange">Boxing</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <div><span class="stars">★★★★☆</span> <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">4.7</span></div>
+                    <span style="font-size:10px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;"><span class="open-dot">●</span> OPEN</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="gym-list-card" onclick="showGymDetail(2)">
+                <div class="gym-thumb">⚡</div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-center">
+                    <div class="gym-name">PULSE STUDIO</div>
+                    <div class="gym-price">₦110k<span>/mo</span></div>
+                  </div>
+                  <div class="gym-loc">📍 Victoria Island · 1.2 km</div>
+                  <div class="flex gap-6 mb-4">
+                    <span class="badge badge-blue">Yoga</span>
+                    <span class="badge badge-blue">HIIT</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <div><span class="stars">★★★★★</span> <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">4.8</span></div>
+                    <span style="font-size:10px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;"><span class="open-dot">●</span> OPEN</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="gym-list-card" onclick="showGymDetail(3)">
+                <div class="gym-thumb">🔥</div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-center">
+                    <div class="gym-name">CORE LAB</div>
+                    <div class="gym-price">₦50k<span>/mo</span></div>
+                  </div>
+                  <div class="gym-loc">📍 Ikoyi · 1.9 km</div>
+                  <div class="flex gap-6 mb-4">
+                    <span class="badge badge-lime">Budget</span>
+                    <span class="badge badge-lime">Cardio</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <div><span class="stars">★★★★☆</span> <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">4.6</span></div>
+                    <span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;font-weight:700;">● CLOSED</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: GYM DETAIL
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-gym-detail">
+        <div class="scroll-area">
+          <div class="detail-hero" id="gym-detail-hero">
+            <button class="back-btn" onclick="goBack()">← Back</button>
+            <div class="detail-emoji" id="gym-detail-emoji">🏋️</div>
+            <div class="detail-gym-name" id="gym-detail-name">APEX FITNESS</div>
+            <div class="detail-gym-loc" id="gym-detail-loc">📍 Lagos Island · 0.3 km</div>
+            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="gym-detail-tags"></div>
+            <div class="stats-strip">
+              <div class="stat-tile"><div class="stat-icon">⭐</div><div class="stat-val" id="gym-detail-rating">4.9</div><div class="stat-lbl">Rating</div></div>
+              <div class="stat-tile"><div class="stat-icon">💬</div><div class="stat-val" id="gym-detail-reviews">1,240</div><div class="stat-lbl">Reviews</div></div>
+              <div class="stat-tile"><div class="stat-icon">💳</div><div class="stat-val" id="gym-detail-price">₦45k</div><div class="stat-lbl">Day Pass</div></div>
+            </div>
+          </div>
+
+          <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchGymTab('info',this)">Info</button>
+            <button class="tab-btn" onclick="switchGymTab('plans',this)">Plans</button>
+            <button class="tab-btn" onclick="switchGymTab('schedule',this)">Schedule</button>
+            <button class="tab-btn" onclick="switchGymTab('reviews',this)">Reviews</button>
+          </div>
+
+          <div id="gym-tab-info" class="tab-panel active px-20 pb-100">
+            <div class="card mb-12">
+              <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:10px;font-weight:700;">Opening Hours</div>
+              <div class="info-row"><span class="info-label">Mon – Fri</span><span class="info-val" id="gym-hours-weekday">5:00 AM – 11:00 PM</span></div>
+              <div class="info-row"><span class="info-label">Saturday</span><span class="info-val">6:00 AM – 9:00 PM</span></div>
+              <div class="info-row"><span class="info-label">Sunday</span><span class="info-val">8:00 AM – 8:00 PM</span></div>
+            </div>
+            <div class="card mb-16">
+              <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:10px;font-weight:700;">Amenities</div>
+              <div id="gym-amenities">
+                <span class="amenity">🏊 Pool</span>
+                <span class="amenity">🧖 Sauna</span>
+                <span class="amenity">🚿 Showers</span>
+                <span class="amenity">🅿️ Parking</span>
+                <span class="amenity">📱 App Access</span>
+                <span class="amenity">☕ Café</span>
+                <span class="amenity">🥤 Juice Bar</span>
+                <span class="amenity">👟 Lockers</span>
+              </div>
+            </div>
+            <button class="btn-lime" onclick="switchGymTab('plans',document.querySelectorAll('.tab-btn')[1])">View Membership Plans</button>
+          </div>
+
+          <div id="gym-tab-plans" class="tab-panel px-20 pb-100">
+            <div class="plan-card">
+              <div class="plan-name" style="color:var(--text2);">STARTER</div>
+              <div class="plan-price">₦14,500<span>/month</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div> Access to 1 gym</div>
+              <div class="plan-feature"><div class="plan-check">✓</div> 3 group classes/week</div>
+              <div class="plan-feature"><div class="plan-check">✓</div> Basic diet plan</div>
+              <div class="plan-feature"><div class="plan-check">✓</div> App tracking</div>
+              <button class="btn-lime outlined mt-16" onclick="showToast('✅ Subscribed to STARTER plan!')">Get Started</button>
+            </div>
+            <div class="plan-card highlighted">
+              <div class="plan-badge">BEST VALUE</div>
+              <div class="plan-name" style="color:var(--lime);">ELITE</div>
+              <div class="plan-price">₦39,500<span>/month</span></div>
+              <div class="plan-feature"><div class="plan-check">✓</div> Access to 5 gyms</div>
+              <div class="plan-feature"><div class="plan-check">✓</div> Unlimited classes</div>
+              <div class="plan-feature"><div class="plan-check">✓</div> Custom diet plan</div>
+              <div class="plan-feature"><div class="plan-check">✓</div> 2 PT sessions/month</div>
+              <div class="plan-feature"><div class="plan-check">✓</div> Priority booking</div>
+              <div class="plan-feature"><div class="plan-check">✓</div> App + wearable sync</div>
+              <button class="btn-lime mt-16" onclick="showToast('🎉 Subscribed to ELITE plan!')">Subscribe Now →</button>
+            </div>
+            <div class="plan-card">
+              <div class="plan-name" style="color:var(--blue);">PRO</div>
+              <div class="plan-price" style="color:var(--blue);">₦74,500<span>/month</span></div>
+              <div class="plan-feature"><div class="plan-check" style="background:rgba(0,200,255,.12);border-color:rgba(0,200,255,.2);color:var(--blue);">✓</div> Unlimited gym access</div>
+              <div class="plan-feature"><div class="plan-check" style="background:rgba(0,200,255,.12);border-color:rgba(0,200,255,.2);color:var(--blue);">✓</div> 8 PT sessions/month</div>
+              <div class="plan-feature"><div class="plan-check" style="background:rgba(0,200,255,.12);border-color:rgba(0,200,255,.2);color:var(--blue);">✓</div> Nutrition coaching</div>
+              <div class="plan-feature"><div class="plan-check" style="background:rgba(0,200,255,.12);border-color:rgba(0,200,255,.2);color:var(--blue);">✓</div> Recovery suite access</div>
+              <div class="plan-feature"><div class="plan-check" style="background:rgba(0,200,255,.12);border-color:rgba(0,200,255,.2);color:var(--blue);">✓</div> DNA fitness report</div>
+              <button class="btn-lime outlined mt-16" onclick="showToast('✅ Subscribed to PRO plan!')">Get Started</button>
+            </div>
+          </div>
+
+          <div id="gym-tab-schedule" class="tab-panel px-20 pb-100">
+            <div class="schedule-row">
+              <div><div class="sched-time">7:00 AM</div><div class="sched-name">HIIT Blast</div><div class="sched-meta">with Amara N. · 45 min</div></div>
+              <button class="btn-lime sm" onclick="showToast('✅ HIIT Blast booked!')">Book</button>
+            </div>
+            <div class="schedule-row">
+              <div><div class="sched-time">9:00 AM</div><div class="sched-name">Yoga Flow</div><div class="sched-meta">with Emeka A. · 60 min</div></div>
+              <button class="btn-lime sm" onclick="showToast('✅ Yoga Flow booked!')">Book</button>
+            </div>
+            <div class="schedule-row">
+              <div><div class="sched-time">11:00 AM</div><div class="sched-name">Strength Training</div><div class="sched-meta">with Chidi O. · 60 min</div></div>
+              <button class="btn-lime sm" onclick="showToast('✅ Strength Training booked!')">Book</button>
+            </div>
+            <div class="schedule-row">
+              <div><div class="sched-time">5:00 PM</div><div class="sched-name">Boxing Basics</div><div class="sched-meta">with Fatima B. · 45 min</div></div>
+              <button class="btn-lime sm" onclick="showToast('✅ Boxing Basics booked!')">Book</button>
+            </div>
+            <div class="schedule-row">
+              <div><div class="sched-time">7:00 PM</div><div class="sched-name">CrossFit WOD</div><div class="sched-meta">with Chidi O. · 50 min</div></div>
+              <button class="btn-lime sm" onclick="showToast('✅ CrossFit WOD booked!')">Book</button>
+            </div>
+          </div>
+
+          <div id="gym-tab-reviews" class="tab-panel px-20 pb-100">
+            <div class="review-card">
+              <div class="flex justify-between mb-4"><span class="review-author">Tunde A.</span><span class="stars">★★★★★</span></div>
+              <p class="review-text">World class equipment and amazing trainers. Best gym in Lagos! The pool and sauna are top tier 🔥</p>
+            </div>
+            <div class="review-card">
+              <div class="flex justify-between mb-4"><span class="review-author">Kemi O.</span><span class="stars">★★★★★</span></div>
+              <p class="review-text">The HIIT classes are absolutely no joke. Lost 8kg in 2 months. Amara is a beast of an instructor!</p>
+            </div>
+            <div class="review-card">
+              <div class="flex justify-between mb-4"><span class="review-author">Uche M.</span><span class="stars">★★★★☆</span></div>
+              <p class="review-text">Great facility overall, slight wait times during peak hours but the equipment quality makes up for it.</p>
+            </div>
+            <div class="review-card">
+              <div class="flex justify-between mb-4"><span class="review-author">Blessing A.</span><span class="stars">★★★★★</span></div>
+              <p class="review-text">The juice bar and café are a great touch after workouts. Membership is worth every naira.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: INSTRUCTORS
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-instructors">
+        <div class="scroll-area">
+          <div class="px-20 pb-100 mt-12">
+            <div style="font-family:'Black Han Sans',sans-serif;font-size:34px;color:var(--text);line-height:1;margin-bottom:4px;">FIND <span style="color:var(--lime);">COACHES</span></div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:14px;">4 certified trainers available</div>
+
+            <div class="search-bar mb-14" style="margin-bottom:14px;">
+              <span style="font-size:18px;color:var(--text3);">🔍</span>
+              <input type="text" placeholder="Search by name or specialty…" style="background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;flex:1;" id="coach-search" oninput="filterCoaches(this.value)"/>
+            </div>
+
+            <div class="pill-row mb-16" id="spec-pills">
+              <div class="pill active" onclick="setPill(this,'spec-pills');filterCoaches('')">All</div>
+              <div class="pill" onclick="setPill(this,'spec-pills');filterCoaches('strength')">Strength</div>
+              <div class="pill" onclick="setPill(this,'spec-pills');filterCoaches('hiit')">HIIT</div>
+              <div class="pill" onclick="setPill(this,'spec-pills');filterCoaches('yoga')">Yoga</div>
+              <div class="pill" onclick="setPill(this,'spec-pills');filterCoaches('boxing')">Boxing</div>
+            </div>
+
+            <div id="instructor-list" class="stagger">
+              <div class="instructor-card" onclick="showInstructorDetail(0)">
+                <div class="flex gap-14">
+                  <div class="inst-avatar">👨🏾‍🦱<div class="inst-avail-dot" style="background:var(--green);"></div></div>
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center">
+                      <div><div class="inst-name">Chidi Okafor</div><div class="inst-spec">Strength & Conditioning</div></div>
+                      <div style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:15px;text-align:right;">₦17.5k<span style="font-size:8px;color:var(--text3);display:block;">/session</span></div>
+                    </div>
+                    <div class="flex gap-6 mt-6 items-center">
+                      <span class="stars" style="font-size:11px;">★★★★★</span>
+                      <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">4.95 · 2,340 sessions</span>
+                    </div>
+                    <div class="flex gap-6 mt-6 justify-between items-center">
+                      <div class="flex gap-6"><span class="badge badge-lime">NASM</span><span class="badge badge-lime">CrossFit L3</span></div>
+                      <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">8 yrs exp</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="inst-footer">
+                  <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">📍 APEX FITNESS</span>
+                  <span style="font-size:10px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">Next: Today 3PM</span>
+                </div>
+              </div>
+
+              <div class="instructor-card" onclick="showInstructorDetail(1)">
+                <div class="flex gap-14">
+                  <div class="inst-avatar">👩🏾<div class="inst-avail-dot" style="background:var(--green);"></div></div>
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center">
+                      <div><div class="inst-name">Amara Nwosu</div><div class="inst-spec">HIIT & Weight Loss</div></div>
+                      <div style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:15px;text-align:right;">₦15k<span style="font-size:8px;color:var(--text3);display:block;">/session</span></div>
+                    </div>
+                    <div class="flex gap-6 mt-6 items-center">
+                      <span class="stars" style="font-size:11px;">★★★★★</span>
+                      <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">4.88 · 1,890 sessions</span>
+                    </div>
+                    <div class="flex gap-6 mt-6 justify-between items-center">
+                      <div class="flex gap-6"><span class="badge badge-orange">ACE</span><span class="badge badge-orange">ISSA</span></div>
+                      <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">6 yrs exp</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="inst-footer">
+                  <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">📍 PULSE STUDIO</span>
+                  <span style="font-size:10px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">Next: Today 5PM</span>
+                </div>
+              </div>
+
+              <div class="instructor-card" onclick="showInstructorDetail(2)">
+                <div class="flex gap-14">
+                  <div class="inst-avatar">🧘🏾‍♂️<div class="inst-avail-dot" style="background:var(--text3);"></div></div>
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center">
+                      <div><div class="inst-name">Emeka Adeyemi</div><div class="inst-spec">Yoga & Mobility</div></div>
+                      <div style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:15px;text-align:right;">₦14k<span style="font-size:8px;color:var(--text3);display:block;">/session</span></div>
+                    </div>
+                    <div class="flex gap-6 mt-6 items-center">
+                      <span class="stars" style="font-size:11px;">★★★★★</span>
+                      <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">4.92 · 1,560 sessions</span>
+                    </div>
+                    <div class="flex gap-6 mt-6 justify-between items-center">
+                      <div class="flex gap-6"><span class="badge badge-blue">RYT-500</span></div>
+                      <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">10 yrs exp</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="inst-footer">
+                  <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">📍 PULSE STUDIO</span>
+                  <span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;font-weight:700;">Next: Tomorrow 9AM</span>
+                </div>
+              </div>
+
+              <div class="instructor-card" onclick="showInstructorDetail(3)">
+                <div class="flex gap-14">
+                  <div class="inst-avatar">🥊<div class="inst-avail-dot" style="background:var(--green);"></div></div>
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center">
+                      <div><div class="inst-name">Fatima Bello</div><div class="inst-spec">Boxing & Kickboxing</div></div>
+                      <div style="font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;font-size:15px;text-align:right;">₦20k<span style="font-size:8px;color:var(--text3);display:block;">/session</span></div>
+                    </div>
+                    <div class="flex gap-6 mt-6 items-center">
+                      <span class="stars" style="font-size:11px;">★★★★★</span>
+                      <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">4.85 · 980 sessions</span>
+                    </div>
+                    <div class="flex gap-6 mt-6 justify-between items-center">
+                      <div class="flex gap-6"><span class="badge badge-red">USA Boxing</span><span class="badge badge-red">NASM</span></div>
+                      <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">5 yrs exp</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="inst-footer">
+                  <span style="font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;">📍 IRON TEMPLE</span>
+                  <span style="font-size:10px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">Next: Today 7PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: INSTRUCTOR DETAIL + BOOKING
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-instructor-detail">
+        <div class="scroll-area" id="instructor-detail-body">
+          <!-- filled dynamically -->
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: BOOKING CONFIRMATION
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-booking-confirm">
+        <div class="confirm-screen">
+          <div class="confirm-emoji">🎉</div>
+          <div class="confirm-title">BOOKED!</div>
+          <div style="font-size:16px;color:var(--text);font-weight:700;margin-bottom:6px;" id="confirm-name">Chidi Okafor</div>
+          <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:4px;" id="confirm-slot">Thu 13 · 9:00 AM</div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:24px;" id="confirm-gym">📍 APEX FITNESS</div>
+          <div class="card w-full mb-24" style="text-align:left;margin-bottom:24px;">
+            <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3);margin-bottom:6px;">BOOKING CONFIRMATION</div>
+            <p style="font-size:13px;color:var(--text2);line-height:1.6;">A confirmation has been sent to your email. Payment of <span id="confirm-price" style="color:var(--lime);font-weight:700;">₦18,000</span> will be collected at session.</p>
+          </div>
+          <button class="btn-lime w-full" onclick="showTab('instructors')">Back to Coaches</button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: WELLNESS
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-wellness">
+        <div class="scroll-area">
+          <div style="background:linear-gradient(180deg,#001A0D 0%,transparent 100%);padding:14px 20px 0;">
+            <div style="font-family:'Black Han Sans',sans-serif;font-size:34px;color:var(--text);line-height:1;margin-bottom:4px;">WELLNESS <span style="color:var(--lime);">HUB</span></div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:16px;">Tips · Diet Plans · Programs</div>
+
+            <div style="display:flex;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:16px;">
+              <button class="auth-tab active" id="well-tab-tips" onclick="setWellnessTab('tips')">💡 Tips</button>
+              <button class="auth-tab" id="well-tab-diet" onclick="setWellnessTab('diet')">🥗 Diet</button>
+              <button class="auth-tab" id="well-tab-programs" onclick="setWellnessTab('programs')">🏆 Programs</button>
+            </div>
+          </div>
+
+          <div class="px-20 pb-100">
+
+            <!-- TIPS -->
+            <div id="well-panel-tips">
+              <div class="focus-card anim-in">
+                <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--lime);margin-bottom:4px;">TODAY'S FOCUS</div>
+                <div style="font-family:'Black Han Sans',sans-serif;font-size:20px;color:var(--text);">💧 Stay Hydrated</div>
+                <p style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.55;">You're 40% short of your daily water goal. Drink 800ml more today.</p>
+                <div style="margin-top:10px;">
+                  <div class="flex justify-between mb-4"><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);">1,200ml / 2,000ml</span><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--lime);">60%</span></div>
+                  <div class="progress-track"><div class="progress-fill" style="width:60%;"></div></div>
+                </div>
+              </div>
+
+              <div class="tip-card" onclick="toggleTip(this)">
+                <div class="flex items-center">
+                  <span class="tip-icon">🥩</span>
+                  <div><div class="tip-title">Protein Timing</div><div style="margin-top:4px;display:flex;gap:8px;align-items:center;"><span class="badge badge-lime">Nutrition</span><span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;">· 2 min read</span></div></div>
+                  <span style="margin-left:auto;color:var(--text3);font-size:14px;" class="tip-arrow">▼</span>
+                </div>
+                <div class="tip-body">Consume 20–40g of protein within 45 minutes post-workout to maximize muscle protein synthesis and accelerate recovery.</div>
+              </div>
+
+              <div class="tip-card" onclick="toggleTip(this)">
+                <div class="flex items-center">
+                  <span class="tip-icon">😴</span>
+                  <div><div class="tip-title">Sleep & Recovery</div><div style="margin-top:4px;display:flex;gap:8px;align-items:center;"><span class="badge badge-blue">Recovery</span><span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;">· 3 min read</span></div></div>
+                  <span style="margin-left:auto;color:var(--text3);font-size:14px;" class="tip-arrow">▼</span>
+                </div>
+                <div class="tip-body">Deep sleep triggers 70% of your daily growth hormone release. 7–9 hours is non-negotiable for muscle gain and fat loss.</div>
+              </div>
+
+              <div class="tip-card" onclick="toggleTip(this)">
+                <div class="flex items-center">
+                  <span class="tip-icon">🫀</span>
+                  <div><div class="tip-title">Zone 2 Cardio</div><div style="margin-top:4px;display:flex;gap:8px;align-items:center;"><span class="badge badge-orange">Cardio</span><span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;">· 4 min read</span></div></div>
+                  <span style="margin-left:auto;color:var(--text3);font-size:14px;" class="tip-arrow">▼</span>
+                </div>
+                <div class="tip-body">Training at 60–70% max heart rate for 30+ mins, 3x/week dramatically improves metabolic efficiency and fat oxidation.</div>
+              </div>
+
+              <div class="tip-card" onclick="toggleTip(this)">
+                <div class="flex items-center">
+                  <span class="tip-icon">💧</span>
+                  <div><div class="tip-title">Hydration Math</div><div style="margin-top:4px;display:flex;gap:8px;align-items:center;"><span class="badge badge-blue">Hydration</span><span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;">· 2 min read</span></div></div>
+                  <span style="margin-left:auto;color:var(--text3);font-size:14px;" class="tip-arrow">▼</span>
+                </div>
+                <div class="tip-body">Drink 35ml per kg of bodyweight daily. Add 500ml per hour of intense exercise. Performance drops at just 2% dehydration.</div>
+              </div>
+            </div>
+
+            <!-- DIET -->
+            <div id="well-panel-diet" style="display:none;">
+              <div class="diet-card">
+                <span class="badge badge-orange">MOST POPULAR</span>
+                <div class="diet-name">🔥 FAT TORCH</div>
+                <div class="diet-desc">High-protein, moderate carb. 500 cal deficit with strategic refeeds. Preserves muscle while burning fat.</div>
+                <div class="macro-row mb-12">
+                  <div class="macro-tile"><div class="macro-val">1,800</div><div class="macro-lbl">Calories</div></div>
+                  <div class="macro-tile"><div class="macro-val">180g</div><div class="macro-lbl">Protein</div></div>
+                  <div class="macro-tile"><div class="macro-val">120g</div><div class="macro-lbl">Carbs</div></div>
+                  <div class="macro-tile"><div class="macro-val">60g</div><div class="macro-lbl">Fat</div></div>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);">⏱ 12 week program</span>
+                  <button class="btn-lime sm" onclick="showToast('✅ FAT TORCH plan activated!')">Start Plan</button>
+                </div>
+              </div>
+
+              <div class="diet-card">
+                <span class="badge badge-lime">BEST FOR GAINS</span>
+                <div class="diet-name">💪 MUSCLE BUILD</div>
+                <div class="diet-desc">Caloric surplus with clean bulking principles. Timed carb cycling for maximum muscle synthesis.</div>
+                <div class="macro-row mb-12">
+                  <div class="macro-tile"><div class="macro-val">3,200</div><div class="macro-lbl">Calories</div></div>
+                  <div class="macro-tile"><div class="macro-val">200g</div><div class="macro-lbl">Protein</div></div>
+                  <div class="macro-tile"><div class="macro-val">380g</div><div class="macro-lbl">Carbs</div></div>
+                  <div class="macro-tile"><div class="macro-val">80g</div><div class="macro-lbl">Fat</div></div>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);">⏱ 16 week program</span>
+                  <button class="btn-lime sm" onclick="showToast('✅ MUSCLE BUILD plan activated!')">Start Plan</button>
+                </div>
+              </div>
+
+              <div class="diet-card">
+                <span class="badge badge-blue">RECOMP</span>
+                <div class="diet-name">⚡ LEAN & MEAN</div>
+                <div class="diet-desc">Maintenance calories with body recomposition focus. Intermittent fasting compatible.</div>
+                <div class="macro-row mb-12">
+                  <div class="macro-tile"><div class="macro-val">2,200</div><div class="macro-lbl">Calories</div></div>
+                  <div class="macro-tile"><div class="macro-val">190g</div><div class="macro-lbl">Protein</div></div>
+                  <div class="macro-tile"><div class="macro-val">180g</div><div class="macro-lbl">Carbs</div></div>
+                  <div class="macro-tile"><div class="macro-val">70g</div><div class="macro-lbl">Fat</div></div>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);">⏱ 8 week program</span>
+                  <button class="btn-lime sm" onclick="showToast('✅ LEAN & MEAN plan activated!')">Start Plan</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- PROGRAMS -->
+            <div id="well-panel-programs" style="display:none;">
+              <div id="enrolled-banner" class="enrolled-banner anim-in" style="display:none;">
+                <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--lime);letter-spacing:2px;margin-bottom:4px;">✓ ENROLLED</div>
+                <div style="font-family:'Black Han Sans',sans-serif;font-size:20px;color:var(--text);" id="enrolled-name">30-DAY SHRED</div>
+                <div style="margin-top:8px;">
+                  <div class="flex justify-between mb-4"><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);">Day 3 of 30</span><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--lime);">10%</span></div>
+                  <div class="progress-track"><div class="progress-fill" style="width:10%;"></div></div>
+                </div>
+              </div>
+
+              <div class="program-card">
+                <div class="program-bg-icon">🔥</div>
+                <span class="badge badge-orange">INTERMEDIATE</span>
+                <div class="program-name">🔥 30-DAY SHRED</div>
+                <div class="program-meta">
+                  <span class="program-meta-item">⏱ 30 days</span>
+                  <span class="program-meta-item">📅 5x/week</span>
+                  <span class="program-meta-item">⚖️ Target: 4–6 kg</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);">👥 12,400 enrolled</span>
+                  <button class="btn-lime sm" id="enroll-btn-0" onclick="enrollProgram('30-DAY SHRED','enroll-btn-0')">Enroll Now</button>
+                </div>
+              </div>
+
+              <div class="program-card" style="border-color:rgba(200,255,0,.2);">
+                <div class="program-bg-icon">🏆</div>
+                <span class="badge badge-blue">BEGINNER</span>
+                <div class="program-name" style="color:var(--lime);">🏆 12-WEEK TRANSFORM</div>
+                <div class="program-meta">
+                  <span class="program-meta-item">⏱ 12 weeks</span>
+                  <span class="program-meta-item">📅 4x/week</span>
+                  <span class="program-meta-item">⚖️ Target: 10–15 kg</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);">👥 8,900 enrolled</span>
+                  <button class="btn-lime sm" id="enroll-btn-1" onclick="enrollProgram('12-WEEK TRANSFORM','enroll-btn-1')">Enroll Now</button>
+                </div>
+              </div>
+
+              <div class="program-card">
+                <div class="program-bg-icon">⚡</div>
+                <span class="badge badge-red">ADVANCED</span>
+                <div class="program-name" style="color:var(--blue);">⚡ HIIT BLITZ</div>
+                <div class="program-meta">
+                  <span class="program-meta-item">⏱ 6 weeks</span>
+                  <span class="program-meta-item">📅 6x/week</span>
+                  <span class="program-meta-item">⚖️ Target: 6–8 kg</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);">👥 5,600 enrolled</span>
+                  <button class="btn-lime sm" id="enroll-btn-2" onclick="enrollProgram('HIIT BLITZ','enroll-btn-2')">Enroll Now</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SCREEN: PROFILE
+           ═══════════════════════════════════════ -->
+      <div class="screen" id="screen-profile">
+        <div class="scroll-area">
+          <div class="profile-hero">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-name">CHIDI OKAFOR</div>
+            <div class="profile-email">chidi@example.com</div>
+            <span class="badge badge-lime">ELITE MEMBER</span>
+          </div>
+
+          <div class="px-20 pb-100 mt-0" style="padding-top:16px;">
+            <div class="stats-strip stagger">
+              <div class="stat-tile"><div class="stat-icon">🔥</div><div class="stat-val">12</div><div class="stat-lbl">Wk Streak</div></div>
+              <div class="stat-tile"><div class="stat-icon">🏋️</div><div class="stat-val">47</div><div class="stat-lbl">Sessions</div></div>
+              <div class="stat-tile"><div class="stat-icon">⚖️</div><div class="stat-val">-8kg</div><div class="stat-lbl">Progress</div></div>
+            </div>
+
+            <div class="profile-menu-item" onclick="showToast('📅 My Bookings')">
+              <div class="profile-menu-left"><span class="profile-menu-icon">📅</span><span class="profile-menu-label">My Bookings</span></div>
+              <span class="profile-menu-arrow">›</span>
+            </div>
+            <div class="profile-menu-item" onclick="showGymDetail(0);switchGymTab('plans',document.querySelectorAll('.tab-btn')[1])">
+              <div class="profile-menu-left"><span class="profile-menu-icon">💎</span><span class="profile-menu-label">Active Plan</span></div>
+              <span style="font-size:10px;font-family:'Space Mono',monospace;color:var(--lime);font-weight:700;">ELITE ›</span>
+            </div>
+            <div class="profile-menu-item" onclick="showTab('wellness');setWellnessTab('programs')">
+              <div class="profile-menu-left"><span class="profile-menu-icon">🏆</span><span class="profile-menu-label">My Programs</span></div>
+              <span class="profile-menu-arrow">›</span>
+            </div>
+            <div class="profile-menu-item" onclick="showTab('wellness');setWellnessTab('diet')">
+              <div class="profile-menu-left"><span class="profile-menu-icon">🥗</span><span class="profile-menu-label">Diet Plan</span></div>
+              <span class="profile-menu-arrow">›</span>
+            </div>
+            <div class="profile-menu-item" onclick="showToast('⚙️ Settings')">
+              <div class="profile-menu-left"><span class="profile-menu-icon">⚙️</span><span class="profile-menu-label">Settings</span></div>
+              <span class="profile-menu-arrow">›</span>
+            </div>
+            <div class="profile-menu-item" onclick="showToast('🔔 Notifications')">
+              <div class="profile-menu-left"><span class="profile-menu-icon">🔔</span><span class="profile-menu-label">Notifications</span></div>
+              <span class="profile-menu-arrow">›</span>
+            </div>
+            <div class="profile-menu-item" onclick="showToast('💬 Help & Support')">
+              <div class="profile-menu-left"><span class="profile-menu-icon">💬</span><span class="profile-menu-label">Help & Support</span></div>
+              <span class="profile-menu-arrow">›</span>
+            </div>
+
+            <button class="btn-signout" onclick="showScreen('auth')">SIGN OUT</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /screen-container -->
+
+    <!-- Bottom Nav (hidden on auth/onboarding) -->
+    <nav id="bottom-nav" style="display:none;">
+      <button class="nav-item active" id="nav-home" onclick="showTab('home')">
+        <span class="nav-icon">⊞</span>
+        <span class="nav-label">Home</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-gyms" onclick="showTab('gyms')">
+        <span class="nav-icon">🏛</span>
+        <span class="nav-label">Gyms</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-instructors" onclick="showTab('instructors')">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Coaches</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-wellness" onclick="showTab('wellness')">
+        <span class="nav-icon">💚</span>
+        <span class="nav-label">Wellness</span>
+        <div class="nav-dot"></div>
+      </button>
+      <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
+        <span class="nav-icon">◎</span>
+        <span class="nav-label">Me</span>
+        <div class="nav-dot"></div>
+      </button>
+    </nav>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+  </div><!-- /phone -->
+</div><!-- /app-shell -->
+
+<script>
+// ============================================================
+// FITCONNECT — APP LOGIC
+// ============================================================
+
+// ── LIVE CLOCK ───────────────────────────────────────────────
+function updateClock(){
+  const n=new Date();
+  document.getElementById('time-display').textContent=
+    n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
+}
+updateClock(); setInterval(updateClock,10000);
+
+// ── STATE ────────────────────────────────────────────────────
+let currentScreen = 'onboarding';
+let prevScreen    = null;
+let obStep        = 0;
+let selectedDay   = 0;
+let selectedSlot  = null;
+let currentInstructor = null;
+const DETAIL_SCREENS  = ['gym-detail','instructor-detail','booking-confirm'];
+
+// ── SCREEN NAV ───────────────────────────────────────────────
+function showScreen(id) {
+  // remove active from all
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    if(id !== 'auth' && id !== 'onboarding') s.classList.add('slide-back');
+  });
+  const target = document.getElementById('screen-'+id);
+  if(!target){ console.warn('No screen: '+id); return; }
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('slide-back'));
+  target.classList.add('active');
+  currentScreen = id;
+
+  const mainScreens = ['home','gyms','instructors','wellness','profile'];
+  const isDetail    = DETAIL_SCREENS.includes(id);
+  const isMain      = mainScreens.includes(id);
+
+  document.getElementById('bottom-nav').style.display =
+    (isMain || isDetail) && id !== 'onboarding' && id !== 'auth' ? 'flex' : 'none';
+
+  // scroll to top
+  const sa = target.querySelector('.scroll-area');
+  if(sa) sa.scrollTop = 0;
+}
+
+function showTab(tab) {
+  showScreen(tab);
+  setNavActive(tab);
+}
+
+function setNavActive(tab) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const btn = document.getElementById('nav-'+tab);
+  if(btn) btn.classList.add('active');
+}
+
+function goBack() {
+  const map = {
+    'gym-detail': 'gyms',
+    'instructor-detail': 'instructors',
+    'booking-confirm': 'instructors',
+  };
+  const dest = map[currentScreen] || 'home';
+  showTab(dest);
+}
+
+// ── ONBOARDING ───────────────────────────────────────────────
+function obNext(){
+  const slides = document.querySelectorAll('.ob-slide');
+  const dots   = document.querySelectorAll('.ob-dot');
+  const btn    = document.getElementById('ob-next-btn');
+  const skip   = document.getElementById('ob-skip-btn');
+
+  slides[obStep].classList.remove('active');
+  obStep++;
+  if(obStep >= slides.length){ showScreen('auth'); return; }
+  slides[obStep].classList.add('active');
+  dots.forEach((d,i)=>{ d.classList.toggle('active', i===obStep); });
+  if(obStep===slides.length-1){
+    btn.textContent='Get Started';
+    skip.style.display='none';
+  }
+}
+
+// ── AUTH ─────────────────────────────────────────────────────
+function switchAuthMode(mode){
+  document.getElementById('auth-signin-form').style.display = mode==='signin'?'block':'none';
+  document.getElementById('auth-signup-form').style.display = mode==='signup'?'block':'none';
+  document.getElementById('auth-signin-tab').classList.toggle('active', mode==='signin');
+  document.getElementById('auth-signup-tab').classList.toggle('active', mode==='signup');
+}
+
+function showSignupStep2(){
+  document.getElementById('signup-step1').style.display='none';
+  document.getElementById('signup-step2').style.display='block';
+}
+
+function selectGoal(el){
+  document.querySelectorAll('.goal-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.innerHTML = el.innerHTML.replace(' ✓','') + ' ✓';
+}
+
+function loginUser(){
+  showScreen('home');
+  setNavActive('home');
+}
+
+// ── PILL FILTERS ─────────────────────────────────────────────
+function setPill(el, groupId){
+  document.querySelectorAll('#'+groupId+' .pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── GYM DATA ─────────────────────────────────────────────────
+const GYMS = [
+  { emoji:'🏋️', name:'APEX FITNESS',    loc:'Lagos Island', dist:'0.3 km', price:'₦45k', monthly:'₦89k', rating:'4.9', reviews:'1,240', tags:['CrossFit','Pool','Sauna'], hours:'5:00 AM – 11:00 PM', amenities:['🏊 Pool','🧖 Sauna','🚿 Showers','🅿️ Parking','📱 App Access','☕ Café','🥤 Juice Bar','👟 Lockers'] },
+  { emoji:'💪', name:'IRON TEMPLE',     loc:'Lekki',         dist:'0.8 km', price:'₦30k', monthly:'₦65k', rating:'4.7', reviews:'890',   tags:['Powerlifting','Boxing'],       hours:'6:00 AM – 10:00 PM', amenities:['🚿 Showers','🅿️ Parking','🎧 Music Zone','🥊 Boxing Ring','👟 Lockers'] },
+  { emoji:'⚡', name:'PULSE STUDIO',   loc:'Victoria Island',dist:'1.2 km', price:'₦55k', monthly:'₦110k',rating:'4.8', reviews:'560',   tags:['Yoga','Pilates','HIIT'],       hours:'6:00 AM – 9:00 PM',  amenities:['🧘 Yoga Studio','🏊 Pool','🚿 Showers','☕ Café','📱 App Access','🛁 Spa'] },
+  { emoji:'🔥', name:'CORE LAB',       loc:'Ikoyi',          dist:'1.9 km', price:'₦25k', monthly:'₦50k', rating:'4.6', reviews:'430',   tags:['Cardio','Weights','Budget'],   hours:'7:00 AM – 9:00 PM',  amenities:['🚿 Showers','🅿️ Parking','🏋️ Free Weights','👟 Lockers'] },
+];
+
+function showGymDetail(idx){
+  const g = GYMS[idx];
+  document.getElementById('gym-detail-emoji').textContent  = g.emoji;
+  document.getElementById('gym-detail-name').textContent   = g.name;
+  document.getElementById('gym-detail-loc').textContent    = '📍 ' + g.loc + ' · ' + g.dist;
+  document.getElementById('gym-detail-rating').textContent = g.rating;
+  document.getElementById('gym-detail-reviews').textContent= g.reviews;
+  document.getElementById('gym-detail-price').textContent  = g.price;
+  document.getElementById('gym-hours-weekday').textContent = g.hours;
+  // tags
+  const tagsEl = document.getElementById('gym-detail-tags');
+  tagsEl.innerHTML = g.tags.map(t=>`<span class="badge badge-lime">${t}</span>`).join('');
+  // amenities
+  const amenEl = document.getElementById('gym-amenities');
+  amenEl.innerHTML = g.amenities.map(a=>`<span class="amenity">${a}</span>`).join('');
+  // reset tab
+  switchGymTab('info', document.querySelector('#screen-gym-detail .tab-btn'));
+  showScreen('gym-detail');
+}
+
+// ── GYM TABS ─────────────────────────────────────────────────
+function switchGymTab(tab, btn){
+  document.querySelectorAll('#screen-gym-detail .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#screen-gym-detail .tab-panel').forEach(p=>p.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const panel = document.getElementById('gym-tab-'+tab);
+  if(panel) panel.classList.add('active');
+}
+
+// ── INSTRUCTOR DATA ───────────────────────────────────────────
+const INSTRUCTORS = [
+  { emoji:'👨🏾‍🦱', name:'Chidi Okafor',  spec:'Strength & Conditioning', rating:'4.95', sessions:'2,340', price:'₦17,500', total:'₦18,000', gym:'APEX FITNESS',    exp:'8 yrs', certs:['NASM','CrossFit L3'], available:true,  nextSlot:'Today, 3PM'    },
+  { emoji:'👩🏾',    name:'Amara Nwosu',   spec:'HIIT & Weight Loss',      rating:'4.88', sessions:'1,890', price:'₦15,000', total:'₦15,500', gym:'PULSE STUDIO',   exp:'6 yrs', certs:['ACE','ISSA'],         available:true,  nextSlot:'Today, 5PM'    },
+  { emoji:'🧘🏾‍♂️', name:'Emeka Adeyemi', spec:'Yoga & Mobility',         rating:'4.92', sessions:'1,560', price:'₦14,000', total:'₦14,500', gym:'PULSE STUDIO',   exp:'10 yrs',certs:['RYT-500'],            available:false, nextSlot:'Tomorrow, 9AM' },
+  { emoji:'🥊',     name:'Fatima Bello',  spec:'Boxing & Kickboxing',     rating:'4.85', sessions:'980',   price:'₦20,000', total:'₦20,500', gym:'IRON TEMPLE',    exp:'5 yrs', certs:['USA Boxing','NASM'],   available:true,  nextSlot:'Today, 7PM'    },
+];
+
+const DAYS  = ['Thu 13','Fri 14','Sat 15','Sun 16','Mon 17'];
+const SLOTS = ['9:00 AM','11:00 AM','2:00 PM','4:00 PM','6:00 PM','8:00 PM'];
+const BUSY  = [1,3]; // index of booked slots
+
+function showInstructorDetail(idx){
+  currentInstructor = idx;
+  selectedDay  = 0;
+  selectedSlot = null;
+  const inst = INSTRUCTORS[idx];
+  const body = document.getElementById('instructor-detail-body');
+
+  const certBadges = inst.certs.map(c=>`<span class="badge badge-lime">${c}</span>`).join('');
+  const availColor = inst.available ? 'var(--green)' : 'var(--text3)';
+  const availText  = inst.available ? 'AVAILABLE' : 'BUSY';
+
+  // Build HTML using string concatenation (no nested template literals)
+  var heroHTML = '';
+  heroHTML += '<div style="background:linear-gradient(180deg,#0D1800,var(--bg));padding:12px 20px 20px;">';
+  heroHTML += '<button class="back-btn" onclick="goBack()">← Back</button>';
+  heroHTML += '<div class="flex gap-14 items-center mb-16">';
+  heroHTML += '<div style="font-size:64px;background:var(--card);border-radius:20px;padding:12px 16px;position:relative;flex-shrink:0;">';
+  heroHTML += inst.emoji;
+  heroHTML += '<div style="position:absolute;bottom:6px;right:6px;width:12px;height:12px;border-radius:50%;background:' + availColor + ';border:2px solid var(--card);"></div>';
+  heroHTML += '</div>';
+  heroHTML += '<div>';
+  heroHTML += '<div style="font-family:\'Black Han Sans\',sans-serif;font-size:24px;color:var(--text);">' + inst.name + '</div>';
+  heroHTML += '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text3);">' + inst.spec + '</div>';
+  heroHTML += '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text3);">📍 ' + inst.gym + '</div>';
+  heroHTML += '<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">' + certBadges + '</div>';
+  heroHTML += '</div></div>';
+  heroHTML += '<div class="stats-strip">';
+  heroHTML += '<div class="stat-tile"><div class="stat-icon">⭐</div><div class="stat-val">' + inst.rating + '</div><div class="stat-lbl">Rating</div></div>';
+  heroHTML += '<div class="stat-tile"><div class="stat-icon">🏋️</div><div class="stat-val">' + inst.sessions + '</div><div class="stat-lbl">Sessions</div></div>';
+  heroHTML += '<div class="stat-tile"><div class="stat-icon">🗓</div><div class="stat-val">' + inst.exp + '</div><div class="stat-lbl">Exp</div></div>';
+  heroHTML += '</div></div>';
+
+  var dayHTML = '<div class="pill-row mb-14" id="day-chips" style="flex-wrap:nowrap;">';
+  for (var di = 0; di < DAYS.length; di++) {
+    var sel = di === 0 ? ' selected' : '';
+    dayHTML += '<div class="chip' + sel + '" onclick="selectDay(this,' + di + ')">' + DAYS[di] + '</div>';
+  }
+  dayHTML += '</div>';
+
+  var slotHTML = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;" id="slot-grid">';
+  for (var si = 0; si < SLOTS.length; si++) {
+    var isBusy = BUSY.includes(si);
+    var slotName = SLOTS[si];
+    if (isBusy) {
+      slotHTML += '<div class="chip booked">' + slotName + '<div style="font-size:8px;color:var(--text3);text-align:center;margin-top:2px;">BOOKED</div></div>';
+    } else {
+      slotHTML += '<div class="chip" onclick="selectSlot(this,\'' + slotName + '\')">' + slotName + '</div>';
+    }
+  }
+  slotHTML += '</div>';
+
+  var summaryHTML = '';
+  summaryHTML += '<div class="booking-summary">';
+  summaryHTML += '<div class="booking-row"><span>Session fee</span><span style="font-family:\'Space Mono\',monospace;color:var(--text);font-weight:700;">' + inst.price + '</span></div>';
+  summaryHTML += '<div class="booking-row"><span>Booking fee</span><span style="font-family:\'Space Mono\',monospace;color:var(--text);font-weight:700;">₦500</span></div>';
+  summaryHTML += '<div class="booking-total"><span>Total</span><span>' + inst.total + '</span></div>';
+  summaryHTML += '</div>';
+
+  var btnHTML = '<button class="btn-lime" id="confirm-booking-btn" onclick="confirmBooking(' + idx + ')" style="opacity:0.5;cursor:not-allowed;">Select a Time Slot</button>';
+
+  body.innerHTML = heroHTML
+    + '<div class="px-20 pb-100">'
+    + '<div style="font-family:\'Black Han Sans\',sans-serif;font-size:20px;color:var(--text);margin-bottom:14px;margin-top:4px;">BOOK A SESSION</div>'
+    + dayHTML + slotHTML + summaryHTML + btnHTML
+    + '</div>';
+
+  showScreen('instructor-detail');
+}
+
+function selectDay(el, idx){
+  selectedDay = idx;
+  document.querySelectorAll('#day-chips .chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectSlot(el, slot){
+  selectedSlot = slot;
+  document.querySelectorAll('#slot-grid .chip:not(.booked)').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  const btn = document.getElementById('confirm-booking-btn');
+  btn.style.opacity = '1';
+  btn.style.cursor  = 'pointer';
+  btn.textContent   = 'Confirm Booking · ' + slot + ' →';
+}
+
+function confirmBooking(idx){
+  if(!selectedSlot){ showToast('⚠ Please select a time slot'); return; }
+  const inst = INSTRUCTORS[idx];
+  document.getElementById('confirm-name').textContent  = inst.name;
+  document.getElementById('confirm-slot').textContent  = DAYS[selectedDay] + ' · ' + selectedSlot;
+  document.getElementById('confirm-gym').textContent   = '📍 ' + inst.gym;
+  document.getElementById('confirm-price').textContent = inst.total;
+  showScreen('booking-confirm');
+}
+
+// ── WELLNESS ─────────────────────────────────────────────────
+function setWellnessTab(tab){
+  ['tips','diet','programs'].forEach(t=>{
+    document.getElementById('well-panel-'+t).style.display  = t===tab ? 'block' : 'none';
+    document.getElementById('well-tab-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+function toggleTip(card){
+  card.classList.toggle('expanded');
+  const arrow = card.querySelector('.tip-arrow');
+  if(arrow) arrow.textContent = card.classList.contains('expanded') ? '▲' : '▼';
+}
+
+function enrollProgram(name, btnId){
+  const btn = document.getElementById(btnId);
+  btn.textContent = '✓ Enrolled';
+  btn.style.background = 'transparent';
+  btn.style.border = '2px solid var(--lime)';
+  btn.style.color  = 'var(--lime)';
+  btn.onclick = null;
+  const banner  = document.getElementById('enrolled-banner');
+  const nameEl  = document.getElementById('enrolled-name');
+  nameEl.textContent = name;
+  banner.style.display = 'block';
+  showToast('🎉 Enrolled in '+name+'!');
+}
+
+// ── COACH SEARCH ─────────────────────────────────────────────
+function filterCoaches(query){
+  const q = query.toLowerCase();
+  document.querySelectorAll('#instructor-list .instructor-card').forEach((card,i) => {
+    const inst = INSTRUCTORS[i];
+    const match = q==='' || inst.name.toLowerCase().includes(q) || inst.spec.toLowerCase().includes(q);
+    card.style.display = match ? 'block' : 'none';
+  });
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+// The onboarding screen is already set as active via HTML class
+</script>
+</body>
+</html>
